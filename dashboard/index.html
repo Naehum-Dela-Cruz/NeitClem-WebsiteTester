@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neitclem Online Applications Health Test</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3450;
+      --accent: #4f8ef7;
+      --accent2: #6366f1;
+      --green: #22c55e;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --orange: #f97316;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #1a1d27 0%, #12152a 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    header .logo {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 800;
+      color: white;
+    }
+
+    header h1 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    header p {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .header-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .last-run {
+      font-size: 0.75rem;
+      color: var(--muted);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 6px 14px;
+    }
+
+    .refresh-btn {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 18px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .refresh-btn:hover {
+      opacity: 0.85;
+    }
+
+    /* ── Main layout ── */
+    main {
+      padding: 28px 32px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    /* ── KPI Grid ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    @media (max-width: 1100px) {
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 22px 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .kpi-card.total::before {
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+
+    .kpi-card.ok::before {
+      background: var(--green);
+    }
+
+    .kpi-card.fail::before {
+      background: var(--red);
+    }
+
+    .kpi-card.pct::before {
+      background: linear-gradient(90deg, var(--green), var(--accent));
+    }
+
+    .kpi-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 6px;
+    }
+
+    .kpi-value {
+      font-size: 2.4rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .kpi-card.total .kpi-value {
+      color: var(--accent);
+    }
+
+    .kpi-card.ok .kpi-value {
+      color: var(--green);
+    }
+
+    .kpi-card.fail .kpi-value {
+      color: var(--red);
+    }
+
+    .kpi-card.pct .kpi-value {
+      color: #a3e635;
+    }
+
+    .kpi-sub {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 4px;
+      margin-bottom: 10px;
+    }
+
+    .kpi-chart-wrap {
+      height: 55px;
+    }
+
+    /* ── Table section ── */
+    .table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .table-header h2 {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .filter-select:focus {
+      border-color: var(--accent);
+    }
+
+    .search-input {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 0.8rem;
+      outline: none;
+      width: 240px;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+    }
+
+    .search-input::placeholder {
+      color: var(--muted);
+    }
+
+    /* URL cell */
+    .url-cell {
+      font-size: 0.75rem;
+      color: var(--muted);
+      max-width: 320px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .url-cell a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .url-cell a:hover {
+      text-decoration: underline;
+    }
+
+    /* ── Table ── */
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+    }
+
+    thead tr {
+      background: var(--surface2);
+      border-bottom: 2px solid var(--border);
+    }
+
+    th {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      white-space: nowrap;
+    }
+
+    th.sortable {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    th.sortable:hover {
+      color: var(--text);
+    }
+
+    th .sort-icon {
+      margin-left: 4px;
+      opacity: 0.5;
+    }
+
+    th.sorted .sort-icon {
+      opacity: 1;
+      color: var(--accent);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: var(--surface2);
+    }
+
+    td {
+      padding: 11px 16px;
+      vertical-align: middle;
+    }
+
+    .app-name {
+      font-weight: 500;
+    }
+
+    /* URL cell */
+    .url-cell {
+      font-size: 0.75rem;
+      max-width: 300px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .url-cell a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .url-cell a:hover {
+      text-decoration: underline;
+    }
+
+    /* Developer dropdown */
+    .dev-select {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s;
+      min-width: 90px;
+    }
+
+    .dev-select:focus {
+      border-color: var(--accent);
+    }
+
+    .dev-select option {
+      background: var(--surface2);
+    }
+
+    .dev-select.assigned-christian {
+      border-color: #818cf8;
+      color: #818cf8;
+    }
+
+    .dev-select.assigned-jaykim {
+      border-color: #34d399;
+      color: #34d399;
+    }
+
+    .dev-select.assigned-rey {
+      border-color: #f472b6;
+      color: #f472b6;
+    }
+
+    /* Status badge */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 6px;
+      padding: 4px 10px;
+      white-space: nowrap;
+    }
+
+    .status-200 {
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--green);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .status-3xx {
+      background: rgba(99, 102, 241, 0.15);
+      color: #818cf8;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    .status-4xx {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--yellow);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .status-5xx {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--red);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .status-none {
+      background: rgba(148, 163, 184, 0.1);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .dot-200 {
+      background: var(--green);
+    }
+
+    .dot-3xx {
+      background: #818cf8;
+    }
+
+    .dot-4xx {
+      background: var(--yellow);
+    }
+
+    .dot-5xx {
+      background: var(--red);
+    }
+
+    .dot-none {
+      background: var(--muted);
+    }
+
+    /* Checked-at */
+    .date-cell {
+      color: var(--muted);
+      font-size: 0.78rem;
+      white-space: nowrap;
+    }
+
+    /* No results */
+    .no-results {
+      text-align: center;
+      padding: 48px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      margin-top: 32px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo">N</div>
+    <div>
+      <h1>Neitclem Online Applications Health Test</h1>
+      <p>Live status of all application endpoints</p>
+    </div>
+    <div class="header-right">
+      <span class="last-run" id="lastRunLabel">Last run: —</span>
+      <button class="refresh-btn" onclick="loadData()">↻ Refresh</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card total">
+        <div class="kpi-label">Total Applications</div>
+        <div class="kpi-value" id="kpiTotal">—</div>
+        <div class="kpi-sub">in this test run</div>
+        <div class="kpi-chart-wrap"><canvas id="chartTotal"></canvas></div>
+      </div>
+      <div class="kpi-card ok">
+        <div class="kpi-label">Status 200</div>
+        <div class="kpi-value" id="kpiOk">—</div>
+        <div class="kpi-sub">healthy responses</div>
+        <div class="kpi-chart-wrap"><canvas id="chartOk"></canvas></div>
+      </div>
+      <div class="kpi-card fail">
+        <div class="kpi-label">Not 200</div>
+        <div class="kpi-value" id="kpiFail">—</div>
+        <div class="kpi-sub">need attention</div>
+        <div class="kpi-chart-wrap"><canvas id="chartFail"></canvas></div>
+      </div>
+      <div class="kpi-card pct">
+        <div class="kpi-label">Success Rate</div>
+        <div class="kpi-value" id="kpiPct">—</div>
+        <div class="kpi-sub">% responding 200</div>
+        <div class="kpi-chart-wrap"><canvas id="chartPct"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-header">
+      <h2>Applications</h2>
+      <div class="filters">
+        <input class="search-input" id="searchInput" type="text" placeholder="Search applications…"
+          oninput="renderTable()" />
+        <select class="filter-select" id="filterStatus" onchange="renderTable()">
+          <option value="">All Statuses</option>
+          <option value="200">200 OK</option>
+          <option value="3xx">3xx Redirect</option>
+          <option value="4xx">4xx Client Error</option>
+          <option value="5xx">5xx Server Error</option>
+        </select>
+        <select class="filter-select" id="filterDev" onchange="renderTable()">
+          <option value="">All Developers</option>
+          <option value="Christian">Christian</option>
+          <option value="Jaykim">Jaykim</option>
+          <option value="Rey">Rey</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="sortable" onclick="sortBy('name')" id="thName">Application Name <span class="sort-icon">↕</span>
+            </th>
+            <th>URL</th>
+            <th>Developer</th>
+            <th class="sortable" onclick="sortBy('status')" id="thStatus">Status <span class="sort-icon">↕</span></th>
+            <th class="sortable" onclick="sortBy('checkedAt')" id="thDate">Checked At <span class="sort-icon">↕</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div class="no-results" id="noResults" style="display:none">No matching applications found.</div>
+    </div>
+  </main>
+
+  <footer>Neitclem Online Applications Health Test · Auto-reads from
+    <code>test-results/applications-ok-results.json</code>
+  </footer>
+
+  <script>
+    // ── State ─────────────────────────────────────────────────────────────────
+    let tableRows = [];   // flat array of latest-entry-per-name from JSON
+    let developers = {};   // { appName: 'Christian'|'Jaykim'|'Rey'|'' }  — localStorage
+    let sortCol = '';
+    let sortAsc = true;
+    let charts = {};
+
+    function loadDevs() {
+      try { developers = JSON.parse(localStorage.getItem('neitclem_devs') || '{}'); } catch { developers = {}; }
+    }
+    function saveDev(name, val) {
+      developers[name] = val;
+      localStorage.setItem('neitclem_devs', JSON.stringify(developers));
+    }
+
+    // ── Fetch JSON ────────────────────────────────────────────────────────────
+    async function loadData() {
+      const PATHS = [
+        '/test-results/applications-ok-results.json',
+        '../test-results/applications-ok-results.json',
+      ];
+      let raw = null;
+      for (const p of PATHS) {
+        try {
+          const r = await fetch(p);
+          if (r.ok) { raw = await r.json(); break; }
+        } catch { }
+      }
+      if (!raw) {
+        document.getElementById('lastRunLabel').textContent = 'No data found';
+        return;
+      }
+
+      // Keep only the latest entry per application name
+      const latestMap = {};
+      for (const entry of raw) {
+        const existing = latestMap[entry.name];
+        if (!existing || new Date(entry.checkedAt) > new Date(existing.checkedAt)) {
+          latestMap[entry.name] = entry;
+        }
+      }
+      tableRows = Object.values(latestMap);
+
+      // Header: last-run timestamp
+      const dates = tableRows.map(e => new Date(e.checkedAt)).filter(d => !isNaN(d));
+      if (dates.length) {
+        const latest = new Date(Math.max(...dates));
+        document.getElementById('lastRunLabel').textContent = 'Last run: ' + formatDate(latest);
+      }
+
+      updateKPIs();
+      renderTable();
+    }
+
+    // ── KPIs ──────────────────────────────────────────────────────────────────
+    function updateKPIs() {
+      const all = tableRows.length;
+      const ok = tableRows.filter(r => r.status === 200).length;
+      const fail = tableRows.filter(r => r.status !== 200).length;
+      const pct = all > 0 ? ((ok / all) * 100).toFixed(1) : '0.0';
+
+      document.getElementById('kpiTotal').textContent = all;
+      document.getElementById('kpiOk').textContent = ok;
+      document.getElementById('kpiFail').textContent = fail;
+      document.getElementById('kpiPct').textContent = pct + '%';
+
+      const history = getHistory();
+      history.push({ total: all, ok, fail, pct: parseFloat(pct), ts: Date.now() });
+      if (history.length > 10) history.shift();
+      saveHistory(history);
+
+      const labels = history.map(() => '');
+      makeChart('chartTotal', labels, history.map(h => h.total), '#4f8ef7');
+      makeChart('chartOk', labels, history.map(h => h.ok), '#22c55e');
+      makeChart('chartFail', labels, history.map(h => h.fail), '#ef4444');
+      makeChart('chartPct', labels, history.map(h => h.pct), '#a3e635');
+    }
+
+    function getHistory() {
+      try { return JSON.parse(localStorage.getItem('neitclem_history') || '[]'); } catch { return []; }
+    }
+    function saveHistory(h) {
+      localStorage.setItem('neitclem_history', JSON.stringify(h));
+    }
+
+    function makeChart(id, labels, data, color) {
+      if (charts[id]) charts[id].destroy();
+      const ctx = document.getElementById(id).getContext('2d');
+      charts[id] = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            data,
+            borderColor: color,
+            backgroundColor: color + '22',
+            borderWidth: 2,
+            tension: 0.4,
+            pointRadius: 2,
+            fill: true,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { x: { display: false }, y: { display: false } },
+          animation: { duration: 400 }
+        }
+      });
+    }
+
+    // ── Status helpers ────────────────────────────────────────────────────────
+    function statusClass(s) {
+      if (s == null) return 'status-none';
+      if (s === 200) return 'status-200';
+      if (s >= 300 && s < 400) return 'status-3xx';
+      if (s >= 400 && s < 500) return 'status-4xx';
+      if (s >= 500) return 'status-5xx';
+      return 'status-none';
+    }
+    function dotClass(s) {
+      if (s == null) return 'dot-none';
+      if (s === 200) return 'dot-200';
+      if (s >= 300 && s < 400) return 'dot-3xx';
+      if (s >= 400 && s < 500) return 'dot-4xx';
+      if (s >= 500) return 'dot-5xx';
+      return 'dot-none';
+    }
+    function statusGroup(s) {
+      if (s == null) return 'none';
+      if (s === 200) return '200';
+      if (s >= 300 && s < 400) return '3xx';
+      if (s >= 400 && s < 500) return '4xx';
+      if (s >= 500) return '5xx';
+      return 'none';
+    }
+
+    function formatDate(d) {
+      if (!d || isNaN(d)) return '—';
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${m}/${day}/${d.getFullYear()}`;
+    }
+
+    // ── Sorting ───────────────────────────────────────────────────────────────
+    function sortBy(col) {
+      if (sortCol === col) sortAsc = !sortAsc;
+      else { sortCol = col; sortAsc = true; }
+      document.querySelectorAll('th.sortable').forEach(th => th.classList.remove('sorted'));
+      const map = { name: 'thName', status: 'thStatus', checkedAt: 'thDate' };
+      if (map[col]) document.getElementById(map[col]).classList.add('sorted');
+      renderTable();
+    }
+
+    // ── Render table ──────────────────────────────────────────────────────────
+    function renderTable() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const stFilter = document.getElementById('filterStatus').value;
+      const devFilter = document.getElementById('filterDev').value;
+
+      let rows = tableRows.map(r => ({ ...r, dev: developers[r.name] || '' }));
+
+      // Filter
+      rows = rows.filter(r => {
+        if (search && !r.name.toLowerCase().includes(search) && !r.url.toLowerCase().includes(search)) return false;
+        if (stFilter && statusGroup(r.status) !== stFilter) return false;
+        if (devFilter && r.dev !== devFilter) return false;
+        return true;
+      });
+
+      // Sort
+      if (sortCol) {
+        rows.sort((a, b) => {
+          let va, vb;
+          if (sortCol === 'name') { va = a.name; vb = b.name; }
+          if (sortCol === 'status') { va = a.status || 0; vb = b.status || 0; }
+          if (sortCol === 'checkedAt') { va = a.checkedAt; vb = b.checkedAt; }
+          if (va < vb) return sortAsc ? -1 : 1;
+          if (va > vb) return sortAsc ? 1 : -1;
+          return 0;
+        });
+      }
+
+      const tbody = document.getElementById('tableBody');
+      const noRes = document.getElementById('noResults');
+
+      if (rows.length === 0) {
+        tbody.innerHTML = '';
+        noRes.style.display = 'block';
+        return;
+      }
+      noRes.style.display = 'none';
+
+      tbody.innerHTML = rows.map(r => {
+        const sc = statusClass(r.status);
+        const dc = dotClass(r.status);
+        const date = formatDate(new Date(r.checkedAt));
+        const devCls = r.dev ? `assigned-${r.dev.toLowerCase()}` : '';
+        const safeName = r.name.replace(/'/g, "\\'");
+
+        return `
+      <tr>
+        <td class="app-name">${r.name}</td>
+        <td class="url-cell"><a href="${r.url}" target="_blank" title="${r.url}">${r.url}</a></td>
+        <td>
+          <select class="dev-select ${devCls}" onchange="onDevChange('${safeName}', this)">
+            <option value="" ${!r.dev ? 'selected' : ''}>— Assign —</option>
+            <option value="Christian" ${r.dev === 'Christian' ? 'selected' : ''}>Christian</option>
+            <option value="Jaykim"    ${r.dev === 'Jaykim' ? 'selected' : ''}>Jaykim</option>
+            <option value="Rey"       ${r.dev === 'Rey' ? 'selected' : ''}>Rey</option>
+          </select>
+        </td>
+        <td>
+          <span class="status-badge ${sc}"><span class="dot ${dc}"></span>${r.status ?? 'No data'}</span>
+        </td>
+        <td class="date-cell">${date}</td>
+      </tr>`;
+      }).join('');
+    }
+
+    function onDevChange(name, sel) {
+      const val = sel.value;
+      saveDev(name, val);
+      sel.className = `dev-select${val ? ' assigned-' + val.toLowerCase() : ''}`;
+      renderTable();
+    }
+
+    // ── Init ──────────────────────────────────────────────────────────────────
+    loadDevs();
+    loadData();
+  </script>
+</body>
+
+</html>
