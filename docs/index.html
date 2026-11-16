@@ -372,41 +372,85 @@
       text-decoration: underline;
     }
 
-    /* Developer dropdown */
-    .dev-select {
-      background: transparent;
+    /* Developer badge */
+    .dev-badge {
+      display: inline-block;
       border: 1px solid var(--border);
-      color: var(--text);
       border-radius: 6px;
-      padding: 4px 8px;
+      padding: 4px 10px;
       font-size: 0.78rem;
-      cursor: pointer;
-      outline: none;
-      transition: border-color 0.2s;
-      min-width: 90px;
-    }
-
-    .dev-select:focus {
-      border-color: var(--accent);
-    }
-
-    .dev-select option {
+      font-weight: 500;
+      color: var(--muted);
       background: var(--surface2);
+      white-space: nowrap;
     }
 
-    .dev-select.assigned-christian {
-      border-color: #818cf8;
+    .dev-badge.assigned-christian {
+      border-color: rgba(129, 140, 248, 0.4);
+      background: rgba(129, 140, 248, 0.12);
       color: #818cf8;
     }
 
-    .dev-select.assigned-jaykim {
-      border-color: #34d399;
+    .dev-badge.assigned-jaykim {
+      border-color: rgba(52, 211, 153, 0.4);
+      background: rgba(52, 211, 153, 0.12);
       color: #34d399;
     }
 
-    .dev-select.assigned-rey {
-      border-color: #f472b6;
+    .dev-badge.assigned-rey {
+      border-color: rgba(244, 114, 182, 0.4);
+      background: rgba(244, 114, 182, 0.12);
       color: #f472b6;
+    }
+
+    .dev-unassigned {
+      color: var(--muted);
+      font-style: italic;
+      font-size: 0.75rem;
+    }
+
+    .th-note {
+      font-size: 0.65rem;
+      color: var(--muted);
+      font-weight: normal;
+      text-transform: none;
+      letter-spacing: normal;
+    }
+
+    /* E2E status badges */
+    .e2e-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 6px;
+      padding: 4px 10px;
+      white-space: nowrap;
+    }
+
+    .e2e-passed {
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--green);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .e2e-failed {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--red);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .e2e-pending {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--yellow);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .e2e-nodata {
+      background: rgba(148, 163, 184, 0.1);
+      color: var(--muted);
+      border: 1px solid var(--border);
     }
 
     /* Status badge */
@@ -577,8 +621,9 @@
             <th class="sortable" onclick="sortBy('name')" id="thName">Application Name <span class="sort-icon">↕</span>
             </th>
             <th>URL</th>
-            <th>Developer</th>
-            <th class="sortable" onclick="sortBy('status')" id="thStatus">Status <span class="sort-icon">↕</span></th>
+            <th>Developer <span class="th-note">(non editable)</span></th>
+            <th class="sortable" onclick="sortBy('status')" id="thStatus">HTTP Status <span class="sort-icon">↕</span></th>
+            <th class="sortable" onclick="sortBy('e2eStatus')" id="thE2E">End-to-End Test <span class="sort-icon">↕</span></th>
             <th class="sortable" onclick="sortBy('checkedAt')" id="thDate">Checked At <span class="sort-icon">↕</span>
             </th>
           </tr>
@@ -597,6 +642,7 @@
     // ── State ─────────────────────────────────────────────────────────────────
     let tableRows = [];   // flat array of latest-entry-per-name from JSON
     let developers = {};   // { appName: 'Christian'|'Jaykim'|'Rey'|'' }  — assignments.json
+    let e2eResults = {};   // { appName: { status: 'passed'|'failed'|'pending', details: '...' } } — e2e-results.json
     let sortCol = '';
     let sortAsc = true;
     let charts = {};
@@ -613,9 +659,34 @@
         } catch { }
       }
     }
-    function saveDev(name, val) {
-      developers[name] = val;
-      localStorage.setItem('neitclem_devs', JSON.stringify(developers));
+
+    async function loadE2EResults() {
+      const PATHS = [
+        './data/e2e-results.json',
+        './data/e2e.json',
+        './data/end-to-end-results.json',
+        '/docs/data/e2e-results.json',
+      ];
+      for (const p of PATHS) {
+        try {
+          const r = await fetch(p);
+          if (r.ok) {
+            const data = await r.json();
+            if (Array.isArray(data)) {
+              e2eResults = {};
+              data.forEach(item => {
+                if (item && item.name) {
+                  e2eResults[item.name] = item;
+                }
+              });
+            } else if (typeof data === 'object' && data !== null) {
+              e2eResults = data;
+            }
+            return;
+          }
+        } catch { }
+      }
+      e2eResults = {};
     }
 
     // ── Fetch JSON ────────────────────────────────────────────────────────────
@@ -740,6 +811,21 @@
       return 'none';
     }
 
+    function e2eBadgeInfo(entry) {
+      if (!entry) return { cls: 'e2e-nodata', dotCls: 'dot-none', text: 'No data' };
+      const s = (typeof entry === 'string' ? entry : (entry.status || '')).toLowerCase();
+      if (s === 'passed' || s === 'pass' || s === 'success' || s === 'ok') {
+        return { cls: 'e2e-passed', dotCls: 'dot-200', text: 'Passed' };
+      }
+      if (s === 'failed' || s === 'fail' || s === 'error') {
+        return { cls: 'e2e-failed', dotCls: 'dot-5xx', text: 'Failed' };
+      }
+      if (s === 'pending' || s === 'running' || s === 'in progress') {
+        return { cls: 'e2e-pending', dotCls: 'dot-4xx', text: 'Pending' };
+      }
+      return { cls: 'e2e-nodata', dotCls: 'dot-none', text: s || 'No data' };
+    }
+
     function formatDate(d) {
       if (!d || isNaN(d)) return '—';
       const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -752,7 +838,7 @@
       if (sortCol === col) sortAsc = !sortAsc;
       else { sortCol = col; sortAsc = true; }
       document.querySelectorAll('th.sortable').forEach(th => th.classList.remove('sorted'));
-      const map = { name: 'thName', status: 'thStatus', checkedAt: 'thDate' };
+      const map = { name: 'thName', status: 'thStatus', e2eStatus: 'thE2E', checkedAt: 'thDate' };
       if (map[col]) document.getElementById(map[col]).classList.add('sorted');
       renderTable();
     }
@@ -763,7 +849,16 @@
       const stFilter = document.getElementById('filterStatus').value;
       const devFilter = document.getElementById('filterDev').value;
 
-      let rows = tableRows.map(r => ({ ...r, dev: developers[r.name] || '' }));
+      let rows = tableRows.map(r => {
+        const e2e = e2eResults[r.name] || null;
+        const e2eText = e2e ? (typeof e2e === 'string' ? e2e : (e2e.status || '')) : '';
+        return {
+          ...r,
+          dev: developers[r.name] || '',
+          e2eStatus: e2eText,
+          e2eRaw: e2e,
+        };
+      });
 
       // Filter
       rows = rows.filter(r => {
@@ -779,6 +874,7 @@
           let va, vb;
           if (sortCol === 'name') { va = a.name; vb = b.name; }
           if (sortCol === 'status') { va = a.status || 0; vb = b.status || 0; }
+          if (sortCol === 'e2eStatus') { va = a.e2eStatus || ''; vb = b.e2eStatus || ''; }
           if (sortCol === 'checkedAt') { va = a.checkedAt; vb = b.checkedAt; }
           if (va < vb) return sortAsc ? -1 : 1;
           if (va > vb) return sortAsc ? 1 : -1;
@@ -800,39 +896,30 @@
         const sc = statusClass(r.status);
         const dc = dotClass(r.status);
         const date = formatDate(new Date(r.checkedAt));
-        const devCls = r.dev ? `assigned-${r.dev.toLowerCase()}` : '';
-        const safeName = r.name.replace(/'/g, "\\'");
+        const devBadge = r.dev
+          ? `<span class="dev-badge assigned-${r.dev.toLowerCase()}">${r.dev}</span>`
+          : `<span class="dev-unassigned">— Unassigned —</span>`;
+        const e2eInfo = e2eBadgeInfo(r.e2eRaw);
 
         return `
       <tr>
         <td class="app-name">${r.name}</td>
         <td class="url-cell"><a href="${r.url}" target="_blank" title="${r.url}">${r.url}</a></td>
-        <td>
-          <select class="dev-select ${devCls}" onchange="onDevChange('${safeName}', this)">
-            <option value="" ${!r.dev ? 'selected' : ''}>— Assign —</option>
-            <option value="Christian" ${r.dev === 'Christian' ? 'selected' : ''}>Christian</option>
-            <option value="Jaykim"    ${r.dev === 'Jaykim' ? 'selected' : ''}>Jaykim</option>
-            <option value="Rey"       ${r.dev === 'Rey' ? 'selected' : ''}>Rey</option>
-          </select>
-        </td>
+        <td>${devBadge}</td>
         <td>
           <span class="status-badge ${sc}"><span class="dot ${dc}"></span>${r.status ?? 'No data'}</span>
+        </td>
+        <td>
+          <span class="e2e-badge ${e2eInfo.cls}"><span class="dot ${e2eInfo.dotCls}"></span>${e2eInfo.text}</span>
         </td>
         <td class="date-cell">${date}</td>
       </tr>`;
       }).join('');
     }
 
-    function onDevChange(name, sel) {
-      const val = sel.value;
-      saveDev(name, val);
-      sel.className = `dev-select${val ? ' assigned-' + val.toLowerCase() : ''}`;
-      renderTable();
-    }
-
     // ── Init ──────────────────────────────────────────────────────────────────
     (async () => {
-      await loadDevs();
+      await Promise.all([loadDevs(), loadE2EResults()]);
       loadData();
     })();
   </script>
