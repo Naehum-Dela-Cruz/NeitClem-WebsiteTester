@@ -590,7 +590,7 @@
   </main>
 
   <footer>Neitclem Online Applications Health Test · Auto-reads from
-    <code>test-results/applications-ok-results.json</code>
+    <code>docs/data/applications-ok-results.json</code>
   </footer>
 
   <script>
@@ -603,8 +603,8 @@
 
     async function loadDevs() {
       const PATHS = [
-        '/dashboard/data/assignments.json',
         './data/assignments.json',
+        '/docs/data/assignments.json',
       ];
       for (const p of PATHS) {
         try {
@@ -621,8 +621,8 @@
     // ── Fetch JSON ────────────────────────────────────────────────────────────
     async function loadData() {
       const PATHS = [
-        '/test-results/applications-ok-results.json',
-        '../test-results/applications-ok-results.json',
+        './data/applications-ok-results.json',
+        '/docs/data/applications-ok-results.json',
       ];
       let raw = null;
       for (const p of PATHS) {

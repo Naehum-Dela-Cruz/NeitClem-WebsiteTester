@@ -47,7 +47,7 @@ const applications = [
   'Tire Dealer & Service/Repair Supplemental Application',
 ];
 
-const filePath = 'test-results/applications-ok-results.json';
+const filePath = 'docs/data/applications-ok-results.json';
 
 test.describe('Applications Library Tests', () => {
   for (const appName of applications) {
