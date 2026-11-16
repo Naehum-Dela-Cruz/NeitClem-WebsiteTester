@@ -511,7 +511,7 @@
     <div class="logo">N</div>
     <div>
       <h1>Neitclem Online Applications Health Test</h1>
-      <p>Live status of all application endpoints</p>
+      <p>Daily status of all application endpoints</p>
     </div>
     <div class="header-right">
       <span class="last-run" id="lastRunLabel">Last run: —</span>
@@ -596,13 +596,22 @@
   <script>
     // ── State ─────────────────────────────────────────────────────────────────
     let tableRows = [];   // flat array of latest-entry-per-name from JSON
-    let developers = {};   // { appName: 'Christian'|'Jaykim'|'Rey'|'' }  — localStorage
+    let developers = {};   // { appName: 'Christian'|'Jaykim'|'Rey'|'' }  — assignments.json
     let sortCol = '';
     let sortAsc = true;
     let charts = {};
 
-    function loadDevs() {
-      try { developers = JSON.parse(localStorage.getItem('neitclem_devs') || '{}'); } catch { developers = {}; }
+    async function loadDevs() {
+      const PATHS = [
+        '/dashboard/data/assignments.json',
+        './data/assignments.json',
+      ];
+      for (const p of PATHS) {
+        try {
+          const r = await fetch(p);
+          if (r.ok) { developers = await r.json(); return; }
+        } catch { }
+      }
     }
     function saveDev(name, val) {
       developers[name] = val;
@@ -822,8 +831,10 @@
     }
 
     // ── Init ──────────────────────────────────────────────────────────────────
-    loadDevs();
-    loadData();
+    (async () => {
+      await loadDevs();
+      loadData();
+    })();
   </script>
 </body>
 
