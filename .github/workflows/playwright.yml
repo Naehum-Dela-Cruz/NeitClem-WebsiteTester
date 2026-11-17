@@ -20,6 +20,15 @@ jobs:
       run: npx playwright install --with-deps
     - name: Run Playwright tests
       run: npx playwright test
+    - name: Upload results to TiDB Cloud
+      if: ${{ !cancelled() }}
+      env:
+        DB_HOST: ${{ secrets.DB_HOST }}
+        DB_PORT: ${{ secrets.DB_PORT }}
+        DB_USERNAME: ${{ secrets.DB_USERNAME }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        DB_DATABASE: ${{ secrets.DB_DATABASE }}
+      run: npm run upload:tidb
     - name: Commit test results
       if: ${{ !cancelled() && github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
       run: |

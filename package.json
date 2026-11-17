@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dashboard": "npx serve . --listen 3000"
+    "dashboard": "npx serve . --listen 3000",
+    "upload:tidb": "npx ts-node scripts/upload-to-tidb.ts"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +14,11 @@
   "devDependencies": {
     "@playwright/test": "^1.65.1",
     "@types/node": "^26.6.6",
-    "serve": "^14.2.8"
+    "serve": "^14.2.8",
+    "ts-node": "^10.9.2"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.10",
+    "mysql2": "^3.24.6"
   }
 }
