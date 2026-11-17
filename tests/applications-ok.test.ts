@@ -24,7 +24,6 @@ const applications = [
   'Restaurant & Tavern Application',
   'Special Events Application',
   'Cosmetic Manufacturing Application',
-  'Insurance, Agents & Brokers Professional Liability Application',
   'Medical Professional Application',
   'Pharmacy Professional Application',
   'Product Liability Application',
