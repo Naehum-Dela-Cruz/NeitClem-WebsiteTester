@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dashboard": "npx serve . --listen 3000",
+    "dashboard": "npx serve docs --listen 3000",
+    "test:ci": "npx playwright install --with-deps && npx playwright test && npm run upload:tidb",
     "upload:tidb": "npx ts-node scripts/upload-to-tidb.ts"
   },
   "keywords": [],
