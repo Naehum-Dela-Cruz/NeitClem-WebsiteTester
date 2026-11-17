@@ -650,7 +650,7 @@
     let charts = {};
 
     async function loadDevs() {
-      // First try the backend API (if running on Render or full server)
+      // 1. Try backend API (Render full web service)
       try {
         const res = await fetch('/api/assignments');
         if (res.ok) {
@@ -659,10 +659,19 @@
         }
       } catch { }
 
-      // Fallback to static JSON file
+      // 2. Try localStorage override (so edits always stick even on static host)
+      try {
+        const local = localStorage.getItem('neitclem_dev_assignments');
+        if (local) {
+          developers = JSON.parse(local);
+          return;
+        }
+      } catch { }
+
+      // 3. Fallback to static JSON file
       const PATHS = [
-        './data/assignments.json',
-        '/docs/data/assignments.json',
+        './data/assignments.json?t=' + Date.now(),
+        '/docs/data/assignments.json?t=' + Date.now(),
       ];
       for (const p of PATHS) {
         try {
@@ -677,6 +686,12 @@
       developers[appName] = dev;
       selectElem.className = `dev-select${dev ? ' assigned-' + dev.toLowerCase() : ''}`;
 
+      // Save to localStorage immediately so it sticks locally across refreshes
+      try {
+        localStorage.setItem('neitclem_dev_assignments', JSON.stringify(developers));
+      } catch { }
+
+      // Sync to backend DB if API is available
       try {
         const resp = await fetch('/api/assign', {
           method: 'POST',
