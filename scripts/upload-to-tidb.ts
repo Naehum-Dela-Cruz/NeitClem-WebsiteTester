@@ -167,6 +167,17 @@ async function syncToTiDB() {
         devId = devMap.get('unassigned') || 0;
       }
 
+      // Check if application has an overridden assigned_developer_id in DB
+      try {
+        const [appDevRow]: any = await connection.query(
+          'SELECT assigned_developer_id FROM dim_application WHERE app_id = ?',
+          [appId]
+        );
+        if (appDevRow.length > 0 && appDevRow[0].assigned_developer_id !== null) {
+          devId = appDevRow[0].assigned_developer_id;
+        }
+      } catch { }
+
       let e2eStatus: string | null = null;
       if (e2eData[res.name]) {
         const val = e2eData[res.name];

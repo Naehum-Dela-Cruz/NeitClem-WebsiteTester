@@ -63,10 +63,13 @@ app.get('/api/developers', async (_req: Request, res: Response) => {
 app.get('/api/assignments', async (_req: Request, res: Response) => {
   try {
     const db = getPool();
-    // Query latest developer assigned in fact or application table
+    // 1. Get developer assigned on the application itself, or fallback to latest fact execution
     const [rows]: any = await db.query(`
-      SELECT a.app_name, COALESCE(d.developer_name, '') as developer_name
+      SELECT 
+        a.app_name,
+        COALESCE(da.developer_name, df.developer_name, '') as developer_name
       FROM dim_application a
+      LEFT JOIN dim_developer da ON a.assigned_developer_id = da.developer_id
       LEFT JOIN (
         SELECT f.app_id, f.developer_id
         FROM fact_application_test_execution f
@@ -76,7 +79,7 @@ app.get('/api/assignments', async (_req: Request, res: Response) => {
           GROUP BY app_id
         ) latest ON f.execution_id = latest.max_exec
       ) curr ON a.app_id = curr.app_id
-      LEFT JOIN dim_developer d ON curr.developer_id = d.developer_id
+      LEFT JOIN dim_developer df ON curr.developer_id = df.developer_id
     `);
 
     const result: Record<string, string> = {};
@@ -100,6 +103,14 @@ app.post('/api/assign', async (req: Request, res: Response) => {
   try {
     const db = getPool();
 
+    // Ensure assigned_developer_id column exists on dim_application
+    try {
+      await db.query(`
+        ALTER TABLE dim_application 
+        ADD COLUMN IF NOT EXISTS assigned_developer_id INT DEFAULT NULL
+      `);
+    } catch { }
+
     // Find developer ID
     let devId = 0; // 0 = Unassigned
     if (developerName && developerName.trim() !== '') {
@@ -109,7 +120,6 @@ app.post('/api/assign', async (req: Request, res: Response) => {
       if (devRows.length > 0) {
         devId = devRows[0].developer_id;
       } else {
-        // Create developer if not exists
         const [insertDev]: any = await db.query('INSERT INTO dim_developer (developer_name) VALUES (?)', [
           developerName.trim(),
         ]);
@@ -117,21 +127,22 @@ app.post('/api/assign', async (req: Request, res: Response) => {
       }
     }
 
-    // Find application ID
-    const [appRows]: any = await db.query('SELECT app_id FROM dim_application WHERE app_name = ?', [appName]);
-    if (appRows.length === 0) {
-      return res.status(404).json({ error: 'Application not found' });
-    }
-    const appId = appRows[0].app_id;
-
-    // Update fact records for this app so the latest execution reflects this developer
+    // Update the application's permanent assigned_developer_id
     await db.query(`
-      UPDATE fact_application_test_execution 
-      SET developer_id = ? 
-      WHERE app_id = ?
-    `, [devId, appId]);
+      UPDATE dim_application 
+      SET assigned_developer_id = ? 
+      WHERE app_name = ?
+    `, [devId, appName]);
 
-    console.log(`Updated assignment: ${appName} -> ${developerName || 'Unassigned'} (dev_id: ${devId})`);
+    // Also update any existing fact rows for this app so history matches
+    await db.query(`
+      UPDATE fact_application_test_execution f
+      JOIN dim_application a ON f.app_id = a.app_id
+      SET f.developer_id = ?
+      WHERE a.app_name = ?
+    `, [devId, appName]);
+
+    console.log(`✅ Saved assignment: ${appName} -> ${developerName || 'Unassigned'} (dev_id: ${devId})`);
     res.json({ success: true, appName, developerName });
   } catch (err: any) {
     console.error('Error updating assignment:', err.message);
