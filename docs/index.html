@@ -622,8 +622,10 @@
             </th>
             <th>URL</th>
             <th>Developer</th>
-            <th class="sortable" onclick="sortBy('status')" id="thStatus">HTTP Status <span class="sort-icon">↕</span></th>
-            <th class="sortable" onclick="sortBy('e2eStatus')" id="thE2E">End-to-End Test <span class="sort-icon">↕</span></th>
+            <th class="sortable" onclick="sortBy('status')" id="thStatus">HTTP Status <span class="sort-icon">↕</span>
+            </th>
+            <th class="sortable" onclick="sortBy('e2eStatus')" id="thE2E">End-to-End Test <span
+                class="sort-icon">↕</span></th>
             <th class="sortable" onclick="sortBy('checkedAt')" id="thDate">Checked At <span class="sort-icon">↕</span>
             </th>
           </tr>
@@ -720,9 +722,10 @@
 
     // ── Fetch JSON ────────────────────────────────────────────────────────────
     async function loadData() {
+      const cacheBust = '?t=' + Date.now();
       const PATHS = [
-        './data/applications-ok-results.json',
-        '/docs/data/applications-ok-results.json',
+        './data/applications-ok-results.json' + cacheBust,
+        '/docs/data/applications-ok-results.json' + cacheBust,
       ];
       let raw = null;
       for (const p of PATHS) {
