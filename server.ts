@@ -21,14 +21,10 @@ app.use((_req, res, next) => {
   next();
 });
 
-// Serve static frontend from docs/ without caching
-app.use(express.static(path.resolve('docs'), {
-  etag: false,
-  lastModified: false,
-  setHeaders: (res) => {
-    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-  }
-}));
+// Health check endpoint
+app.get('/api/health', (_req: Request, res: Response) => {
+  res.json({ status: 'ok', server: 'express', timestamp: new Date().toISOString() });
+});
 
 // Database pool
 let pool: mysql.Pool | null = null;
@@ -232,6 +228,20 @@ app.post('/api/assign', async (req: Request, res: Response) => {
     console.error('Error updating assignment:', err.message);
     res.status(500).json({ error: err.message });
   }
+});
+
+// Serve frontend static files AFTER API routes
+app.use(express.static(path.resolve('docs'), {
+  etag: false,
+  lastModified: false,
+  setHeaders: (res) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  }
+}));
+
+// Fallback to index.html for any frontend route
+app.get('*', (_req: Request, res: Response) => {
+  res.sendFile(path.resolve('docs/index.html'));
 });
 
 app.listen(port, () => {
