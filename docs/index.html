@@ -372,41 +372,41 @@
       text-decoration: underline;
     }
 
-    /* Developer badge */
-    .dev-badge {
-      display: inline-block;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 0.78rem;
-      font-weight: 500;
-      color: var(--muted);
+    /* Developer select dropdown */
+    .dev-select {
       background: var(--surface2);
-      white-space: nowrap;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s;
+      min-width: 95px;
     }
 
-    .dev-badge.assigned-christian {
-      border-color: rgba(129, 140, 248, 0.4);
-      background: rgba(129, 140, 248, 0.12);
+    .dev-select:focus {
+      border-color: var(--accent);
+    }
+
+    .dev-select option {
+      background: var(--surface2);
+    }
+
+    .dev-select.assigned-christian {
+      border-color: #818cf8;
       color: #818cf8;
     }
 
-    .dev-badge.assigned-jaykim {
-      border-color: rgba(52, 211, 153, 0.4);
-      background: rgba(52, 211, 153, 0.12);
+    .dev-select.assigned-jaykim {
+      border-color: #34d399;
       color: #34d399;
     }
 
-    .dev-badge.assigned-rey {
-      border-color: rgba(244, 114, 182, 0.4);
-      background: rgba(244, 114, 182, 0.12);
+    .dev-select.assigned-rey {
+      border-color: #f472b6;
       color: #f472b6;
-    }
-
-    .dev-unassigned {
-      color: var(--muted);
-      font-style: italic;
-      font-size: 0.75rem;
     }
 
     .th-note {
@@ -621,7 +621,7 @@
             <th class="sortable" onclick="sortBy('name')" id="thName">Application Name <span class="sort-icon">↕</span>
             </th>
             <th>URL</th>
-            <th>Developer <span class="th-note">(non editable)</span></th>
+            <th>Developer <span class="th-note">(editable)</span></th>
             <th class="sortable" onclick="sortBy('status')" id="thStatus">HTTP Status <span class="sort-icon">↕</span></th>
             <th class="sortable" onclick="sortBy('e2eStatus')" id="thE2E">End-to-End Test <span class="sort-icon">↕</span></th>
             <th class="sortable" onclick="sortBy('checkedAt')" id="thDate">Checked At <span class="sort-icon">↕</span>
@@ -648,6 +648,16 @@
     let charts = {};
 
     async function loadDevs() {
+      // First try the backend API (if running on Render or full server)
+      try {
+        const res = await fetch('/api/assignments');
+        if (res.ok) {
+          developers = await res.json();
+          return;
+        }
+      } catch { }
+
+      // Fallback to static JSON file
       const PATHS = [
         './data/assignments.json',
         '/docs/data/assignments.json',
@@ -657,6 +667,25 @@
           const r = await fetch(p);
           if (r.ok) { developers = await r.json(); return; }
         } catch { }
+      }
+    }
+
+    async function onDevChange(appName, selectElem) {
+      const dev = selectElem.value;
+      developers[appName] = dev;
+      selectElem.className = `dev-select${dev ? ' assigned-' + dev.toLowerCase() : ''}`;
+
+      try {
+        const resp = await fetch('/api/assign', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ appName, developerName: dev }),
+        });
+        if (!resp.ok) {
+          console.warn('Backend assign returned non-OK status:', resp.status);
+        }
+      } catch (err) {
+        console.warn('Could not sync assignment to backend API:', err);
       }
     }
 
@@ -896,16 +925,22 @@
         const sc = statusClass(r.status);
         const dc = dotClass(r.status);
         const date = formatDate(new Date(r.checkedAt));
-        const devBadge = r.dev
-          ? `<span class="dev-badge assigned-${r.dev.toLowerCase()}">${r.dev}</span>`
-          : `<span class="dev-unassigned">— Unassigned —</span>`;
+        const devCls = r.dev ? `assigned-${r.dev.toLowerCase()}` : '';
+        const safeName = r.name.replace(/'/g, "\\'");
         const e2eInfo = e2eBadgeInfo(r.e2eRaw);
 
         return `
       <tr>
         <td class="app-name">${r.name}</td>
         <td class="url-cell"><a href="${r.url}" target="_blank" title="${r.url}">${r.url}</a></td>
-        <td>${devBadge}</td>
+        <td>
+          <select class="dev-select ${devCls}" onchange="onDevChange('${safeName}', this)">
+            <option value="" ${!r.dev ? 'selected' : ''}>— Unassigned —</option>
+            <option value="Christian" ${r.dev === 'Christian' ? 'selected' : ''}>Christian</option>
+            <option value="Jaykim"    ${r.dev === 'Jaykim' ? 'selected' : ''}>Jaykim</option>
+            <option value="Rey"       ${r.dev === 'Rey' ? 'selected' : ''}>Rey</option>
+          </select>
+        </td>
         <td>
           <span class="status-badge ${sc}"><span class="dot ${dc}"></span>${r.status ?? 'No data'}</span>
         </td>
