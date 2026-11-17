@@ -12,8 +12,23 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Serve static frontend from docs/
-app.use(express.static(path.resolve('docs')));
+// 0. Disable caching headers for all API and HTML responses
+app.use((_req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  res.set('Surrogate-Control', 'no-store');
+  next();
+});
+
+// Serve static frontend from docs/ without caching
+app.use(express.static(path.resolve('docs'), {
+  etag: false,
+  lastModified: false,
+  setHeaders: (res) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  }
+}));
 
 // Database pool
 let pool: mysql.Pool | null = null;
@@ -47,7 +62,76 @@ function getPool(): mysql.Pool {
   return pool;
 }
 
-// 1. Get all developers list
+// 1. Get all latest application test results directly from TiDB
+app.get('/api/applications', async (_req: Request, res: Response) => {
+  try {
+    const db = getPool();
+    const [rows]: any = await db.query(`
+      SELECT 
+        a.app_name AS name,
+        a.target_url AS url,
+        f.http_status_code AS status,
+        f.is_http_ok AS ok,
+        f.e2e_status AS e2eStatus,
+        COALESCE(da.developer_name, df.developer_name, '') AS developer,
+        f.created_at AS checkedAt
+      FROM dim_application a
+      LEFT JOIN (
+        SELECT f1.*
+        FROM fact_application_test_execution f1
+        INNER JOIN (
+          SELECT app_id, MAX(execution_id) AS max_exec
+          FROM fact_application_test_execution
+          GROUP BY app_id
+        ) latest ON f1.execution_id = latest.max_exec
+      ) f ON a.app_id = f.app_id
+      LEFT JOIN dim_developer da ON a.assigned_developer_id = da.developer_id
+      LEFT JOIN dim_developer df ON f.developer_id = df.developer_id
+      ORDER BY a.app_name ASC
+    `);
+
+    res.json(rows);
+  } catch (err: any) {
+    console.error('Error fetching applications from DB:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 2. Get history metrics for KPI charts straight from TiDB
+app.get('/api/history', async (_req: Request, res: Response) => {
+  try {
+    const db = getPool();
+    const [runs]: any = await db.query(`
+      SELECT 
+        r.test_run_id,
+        r.started_at,
+        COUNT(f.execution_id) AS total,
+        SUM(CASE WHEN f.http_status_code = 200 THEN 1 ELSE 0 END) AS ok,
+        SUM(CASE WHEN f.http_status_code != 200 THEN 1 ELSE 0 END) AS fail
+      FROM dim_test_run r
+      LEFT JOIN fact_application_test_execution f ON r.test_run_id = f.test_run_id
+      GROUP BY r.test_run_id, r.started_at
+      ORDER BY r.started_at DESC
+      LIMIT 10
+    `);
+
+    // Reverse to chronological order for charts
+    const history = runs.reverse().map((r: any) => {
+      const total = Number(r.total) || 0;
+      const ok = Number(r.ok) || 0;
+      const fail = Number(r.fail) || 0;
+      const pct = total > 0 ? parseFloat(((ok / total) * 100).toFixed(1)) : 0;
+      return { total, ok, fail, pct, ts: new Date(r.started_at).getTime() };
+    });
+
+    res.json(history);
+  } catch (err: any) {
+    console.error('Error fetching history:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 3. Get all developers list
 app.get('/api/developers', async (_req: Request, res: Response) => {
   try {
     const db = getPool();

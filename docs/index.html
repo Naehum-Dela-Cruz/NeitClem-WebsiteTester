@@ -636,133 +636,82 @@
     </div>
   </main>
 
-  <footer>Neitclem Online Applications Health Test · Auto-reads from
-    <code>docs/data/applications-ok-results.json</code>
+  <footer>Neitclem Online Applications Health Test · Powered directly by TiDB Cloud
   </footer>
 
   <script>
     // ── State ─────────────────────────────────────────────────────────────────
-    let tableRows = [];   // flat array of latest-entry-per-name from JSON
-    let developers = {};   // { appName: 'Christian'|'Jaykim'|'Rey'|'' }  — assignments.json
-    let e2eResults = {};   // { appName: { status: 'passed'|'failed'|'pending', details: '...' } } — e2e-results.json
+    let tableRows = [];   // loaded from TiDB API /api/applications
+    let developers = {};   // { appName: 'Christian'|'Jaykim'|'Rey'|'' } — from TiDB API
+    let e2eResults = {};   // from TiDB / e2e API
     let sortCol = '';
     let sortAsc = true;
     let charts = {};
 
+    // ── Load directly from TiDB backend ───────────────────────────────────────
     async function loadDevs() {
-      // 1. Try backend API (Render full web service)
       try {
-        const res = await fetch('/api/assignments');
+        const res = await fetch('/api/assignments', { cache: 'no-store' });
         if (res.ok) {
           developers = await res.json();
           return;
         }
-      } catch { }
-
-      // 2. Try localStorage override (so edits always stick even on static host)
-      try {
-        const local = localStorage.getItem('neitclem_dev_assignments');
-        if (local) {
-          developers = JSON.parse(local);
-          return;
-        }
-      } catch { }
-
-      // 3. Fallback to static JSON file
-      const PATHS = [
-        './data/assignments.json?t=' + Date.now(),
-        '/docs/data/assignments.json?t=' + Date.now(),
-      ];
-      for (const p of PATHS) {
-        try {
-          const r = await fetch(p);
-          if (r.ok) { developers = await r.json(); return; }
-        } catch { }
+      } catch (err) {
+        console.error('Failed to load assignments from TiDB:', err);
       }
     }
 
     async function onDevChange(appName, selectElem) {
       const dev = selectElem.value;
-      developers[appName] = dev;
       selectElem.className = `dev-select${dev ? ' assigned-' + dev.toLowerCase() : ''}`;
 
-      // Save to localStorage immediately so it sticks locally across refreshes
-      try {
-        localStorage.setItem('neitclem_dev_assignments', JSON.stringify(developers));
-      } catch { }
-
-      // Sync to backend DB if API is available
       try {
         const resp = await fetch('/api/assign', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ appName, developerName: dev }),
         });
-        if (!resp.ok) {
-          console.warn('Backend assign returned non-OK status:', resp.status);
+        if (resp.ok) {
+          developers[appName] = dev;
+          // Reload fresh from TiDB to guarantee view is synced with DB
+          await loadData();
+        } else {
+          console.error('Failed to update developer in TiDB:', await resp.text());
         }
       } catch (err) {
-        console.warn('Could not sync assignment to backend API:', err);
+        console.error('Could not sync assignment to TiDB:', err);
       }
     }
 
     async function loadE2EResults() {
-      const PATHS = [
-        './data/e2e-results.json',
-        './data/e2e.json',
-        './data/end-to-end-results.json',
-        '/docs/data/e2e-results.json',
-      ];
-      for (const p of PATHS) {
-        try {
-          const r = await fetch(p);
-          if (r.ok) {
-            const data = await r.json();
-            if (Array.isArray(data)) {
-              e2eResults = {};
-              data.forEach(item => {
-                if (item && item.name) {
-                  e2eResults[item.name] = item;
-                }
-              });
-            } else if (typeof data === 'object' && data !== null) {
-              e2eResults = data;
-            }
-            return;
-          }
-        } catch { }
-      }
-      e2eResults = {};
+      // Future endpoint if needed
     }
 
-    // ── Fetch JSON ────────────────────────────────────────────────────────────
+    // ── Fetch fresh data straight from TiDB ────────────────────────────────────
     async function loadData() {
-      const cacheBust = '?t=' + Date.now();
-      const PATHS = [
-        './data/applications-ok-results.json' + cacheBust,
-        '/docs/data/applications-ok-results.json' + cacheBust,
-      ];
       let raw = null;
-      for (const p of PATHS) {
-        try {
-          const r = await fetch(p);
-          if (r.ok) { raw = await r.json(); break; }
-        } catch { }
+      try {
+        const r = await fetch('/api/applications', { cache: 'no-store' });
+        if (r.ok) {
+          raw = await r.json();
+        }
+      } catch (err) {
+        console.error('Error fetching applications from /api/applications:', err);
       }
-      if (!raw) {
-        document.getElementById('lastRunLabel').textContent = 'No data found';
+
+      if (!raw || raw.length === 0) {
+        document.getElementById('lastRunLabel').textContent = 'No data found in TiDB';
         return;
       }
 
-      // Keep only the latest entry per application name
-      const latestMap = {};
-      for (const entry of raw) {
-        const existing = latestMap[entry.name];
-        if (!existing || new Date(entry.checkedAt) > new Date(existing.checkedAt)) {
-          latestMap[entry.name] = entry;
+      tableRows = raw;
+
+      // Update developer mapping from the fresh database query
+      tableRows.forEach(row => {
+        if (row.developer) {
+          developers[row.name] = row.developer;
         }
-      }
-      tableRows = Object.values(latestMap);
+      });
 
       // Header: last-run timestamp
       const dates = tableRows.map(e => new Date(e.checkedAt)).filter(d => !isNaN(d));
@@ -771,12 +720,12 @@
         document.getElementById('lastRunLabel').textContent = 'Last run: ' + formatDate(latest);
       }
 
-      updateKPIs();
+      await updateKPIs();
       renderTable();
     }
 
-    // ── KPIs ──────────────────────────────────────────────────────────────────
-    function updateKPIs() {
+    // ── KPIs from TiDB ────────────────────────────────────────────────────────
+    async function updateKPIs() {
       const all = tableRows.length;
       const ok = tableRows.filter(r => r.status === 200).length;
       const fail = tableRows.filter(r => r.status !== 200).length;
@@ -787,23 +736,23 @@
       document.getElementById('kpiFail').textContent = fail;
       document.getElementById('kpiPct').textContent = pct + '%';
 
-      const history = getHistory();
-      history.push({ total: all, ok, fail, pct: parseFloat(pct), ts: Date.now() });
-      if (history.length > 10) history.shift();
-      saveHistory(history);
+      let history = [];
+      try {
+        const res = await fetch('/api/history', { cache: 'no-store' });
+        if (res.ok) {
+          history = await res.json();
+        }
+      } catch { }
+
+      if (history.length === 0) {
+        history = [{ total: all, ok, fail, pct: parseFloat(pct) }];
+      }
 
       const labels = history.map(() => '');
       makeChart('chartTotal', labels, history.map(h => h.total), '#4f8ef7');
       makeChart('chartOk', labels, history.map(h => h.ok), '#22c55e');
       makeChart('chartFail', labels, history.map(h => h.fail), '#ef4444');
       makeChart('chartPct', labels, history.map(h => h.pct), '#a3e635');
-    }
-
-    function getHistory() {
-      try { return JSON.parse(localStorage.getItem('neitclem_history') || '[]'); } catch { return []; }
-    }
-    function saveHistory(h) {
-      localStorage.setItem('neitclem_history', JSON.stringify(h));
     }
 
     function makeChart(id, labels, data, color) {
