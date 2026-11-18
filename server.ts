@@ -76,10 +76,10 @@ app.get('/api/applications', async (_req: Request, res: Response) => {
         SELECT f1.*
         FROM fact_application_test_execution f1
         INNER JOIN (
-          SELECT app_id, MAX(execution_id) AS max_exec
+          SELECT app_id, MAX(created_at) AS max_created
           FROM fact_application_test_execution
           GROUP BY app_id
-        ) latest ON f1.execution_id = latest.max_exec
+        ) latest ON f1.app_id = latest.app_id AND f1.created_at = latest.max_created
       ) f ON a.app_id = f.app_id
       LEFT JOIN dim_developer da ON a.assigned_developer_id = da.developer_id
       LEFT JOIN dim_developer df ON f.developer_id = df.developer_id
