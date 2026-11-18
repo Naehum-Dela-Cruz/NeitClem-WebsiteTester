@@ -240,7 +240,7 @@ app.use(express.static(path.resolve('docs'), {
 }));
 
 // Fallback to index.html for any frontend route
-app.get('*', (_req: Request, res: Response) => {
+app.get('{*path}', (_req: Request, res: Response) => {
   res.sendFile(path.resolve('docs/index.html'));
 });
 
