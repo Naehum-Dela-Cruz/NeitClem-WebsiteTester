@@ -1,558 +1,231 @@
 import { test, expect } from '@playwright/test';
+import path from 'path';
 
-test('test', async ({ page }) => {
-    test.setTimeout(180_000); // long end-to-end flow incl. slow save/PDF generation
+test('Habitational Application end-to-end submission', async ({ page }) => {
+    test.setTimeout(180_000); // Long end-to-end flow incl. slow save/PDF generation
+
+    // Automatically accept browser confirm dialogs (e.g. "Start New Application" confirmation)
+    page.on('dialog', async (dialog) => {
+        console.log(`Dialog message: ${dialog.message()}`);
+        await dialog.accept().catch(() => {});
+    });
+
     await page.goto('https://habitational.gratusinc.org/');
-    await page.getByRole('spinbutton', { name: 'How many locations do you' }).fill('2');
-    await page.getByRole('spinbutton', { name: 'How many locations do you' }).click();
     await page.getByRole('spinbutton', { name: 'How many locations do you' }).fill('1');
-    await page.getByRole('spinbutton', { name: 'How many locations do you' }).click();
-    await page.getByText('Include Property Coverage', { exact: true }).click();
     await page.getByRole('checkbox', { name: 'Include Property Coverage' }).check();
-    await page.getByRole('textbox', { name: 'Street Address: *' }).click();
     await page.getByRole('textbox', { name: 'Street Address: *' }).fill('7442 N Figueroa Street');
-    await page.getByRole('textbox', { name: 'City: *' }).click();
     await page.getByRole('textbox', { name: 'City: *' }).fill('Los Angeles');
     await page.getByLabel('State: *').selectOption('CA');
-    await page.getByRole('textbox', { name: 'Zip Code: *' }).click();
     await page.getByRole('textbox', { name: 'Zip Code: *' }).fill('90041');
-    await page.getByRole('textbox', { name: 'County: *' }).click();
     await page.getByRole('textbox', { name: 'County: *' }).fill('Los Angeles');
-    await page.getByRole('spinbutton', { name: 'Number of Apartment Units: *' }).click();
     await page.getByRole('spinbutton', { name: 'Number of Apartment Units: *' }).fill('9');
-    await page.getByRole('textbox', { name: 'Assisted Living / Senior' }).click();
     await page.getByRole('textbox', { name: 'Assisted Living / Senior' }).fill('25');
-    await page.getByRole('textbox', { name: 'General Population:' }).click();
     await page.getByRole('textbox', { name: 'General Population:' }).fill('25');
-    await page.getByRole('textbox', { name: 'Student Occupancy - Post' }).click();
     await page.getByRole('textbox', { name: 'Student Occupancy - Post' }).fill('25');
-    await page.getByRole('textbox', { name: 'Subsidized Housing:' }).click();
     await page.getByRole('textbox', { name: 'Subsidized Housing:' }).fill('10');
-    await page.getByRole('textbox', { name: 'Treatment / Recovery Facility:' }).click();
     await page.getByRole('textbox', { name: 'Treatment / Recovery Facility:' }).fill('15');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).fill('1');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).click();
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).fill('2');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).dblclick();
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).fill('1');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).click();
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).fill('2');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).click();
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).fill('3');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).dblclick();
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).fill('4');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).click({
-        clickCount: 3
-    });
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).click();
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).fill('5');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).click();
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).fill('6');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).dblclick();
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).fill('7');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).click({
-        clickCount: 3
-    });
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).fill('8');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).click({
-        clickCount: 4
-    });
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).fill('9');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).click({
-        clickCount: 5
-    });
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).fill('10');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).click({
-        clickCount: 6
-    });
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).fill('11');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).click({
-        clickCount: 7
-    });
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).fill('12');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).click({
-        clickCount: 8
-    });
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).fill('13');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).click({
-        clickCount: 9
-    });
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).fill('14');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).click({
-        clickCount: 10
-    });
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).fill('15');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).click({
-        clickCount: 11
-    });
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).fill('16');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).click({
-        clickCount: 12
-    });
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).fill('17');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).click({
-        clickCount: 13
-    });
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).fill('18');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).click({
-        clickCount: 14
-    });
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).fill('19');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).click({
-        clickCount: 15
-    });
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).fill('20');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).click({
-        clickCount: 16
-    });
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).press('ArrowLeft');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).press('ArrowRight');
-    await page.getByRole('spinbutton', { name: '1. Total number of days' }).press('ArrowLeft');
     await page.getByRole('spinbutton', { name: '1. Total number of days' }).fill('200');
-    await page.getByText('Yes').first().click();
     await page.locator('#animalsAllowed-yes').check();
-    await page.locator('#animalsAllowed-no').check();
-    await page.locator('div').filter({ hasText: /^Yes$/ }).first().click();
-    await page.locator('div').filter({ hasText: /^Yes$/ }).first().click();
-    await page.locator('#animalsAllowed-yes').check();
-    await page.getByText('Yes').nth(2).click();
-    await page.locator('#aggressiveDogBreedsLimited-yes').check();
-    await page.locator('#aggressiveDogBreedsLimited-no').check();
     await page.locator('#aggressiveDogBreedsLimited-yes').check();
     await page.locator('#cooperativeHousing-yes').check();
-    await page.locator('#cooperativeHousing-no').check();
-    await page.locator('#cooperativeHousing-yes').check();
-    await page.getByRole('spinbutton', { name: 'Year Built:' }).click();
     await page.getByRole('spinbutton', { name: 'Year Built:' }).fill('2026');
-    await page.getByRole('spinbutton', { name: 'Number of stories:' }).click();
-    await page.getByRole('spinbutton', { name: 'Number of stories:' }).fill('1');
-    await page.getByRole('spinbutton', { name: 'Number of stories:' }).click();
-    await page.getByRole('spinbutton', { name: 'Number of stories:' }).fill('2');
-    await page.getByRole('spinbutton', { name: 'Number of stories:' }).dblclick();
     await page.getByRole('spinbutton', { name: 'Number of stories:' }).fill('3');
-    await page.getByRole('spinbutton', { name: 'Number of stories:' }).click();
-    await page.getByRole('spinbutton', { name: 'Number of Buildings:' }).click();
     await page.getByRole('spinbutton', { name: 'Number of Buildings:' }).fill('1');
-    await page.getByRole('spinbutton', { name: 'Number of Buildings:' }).click();
-    await page.getByRole('spinbutton', { name: 'Annual Revenue:' }).click();
     await page.getByRole('spinbutton', { name: 'Annual Revenue:' }).fill('9999997');
-    await page.getByText('No').nth(3).click();
-    await page.locator('#adequateEgress-no').check();
     await page.locator('#adequateEgress-yes').check();
-    await page.getByText('Yes').nth(5).click();
     await page.locator('#emergencyProcedures-yes').check();
-    await page.locator('div').filter({ hasText: /^No$/ }).nth(4).click();
-    await page.locator('#emergencyProcedures-no').check();
-    await page.getByText('Yes').nth(5).click();
-    await page.locator('#emergencyProcedures-yes').check();
-    await page.locator('div').filter({ hasText: /^Yes$/ }).nth(5).click();
     await page.locator('#exitsMarked-yes').check();
     await page.locator('#stairwaysExitsClutterFree-yes').check();
     await page.locator('#burglarBars-yes').check();
-    await page.locator('#burglarBars-no').check();
-    await page.locator('#burglarBars-yes').check();
     await page.locator('#quickReleaseMechanism-yes').check();
-    await page.locator('#quickReleaseMechanism-no').check();
-    await page.locator('#quickReleaseMechanism-yes').check();
-    await page.locator('div:nth-child(10) > .card-body > .row > .col-md-12 > div > .d-flex > .me-4 > .form-check-label').click();
     await page.locator('#ownerManagerResiding-yes').check();
-    await page.locator('#ownerManagerResiding-no').check();
-    await page.locator('#managerInsurance-yes').check();
-    await page.locator('div:nth-child(11) > .card-body > .row > .col-md-12 > div > .d-flex > div:nth-child(2)').click();
-    await page.locator('#managerInsurance-na').check();
-    await page.locator('#managerInsurance-no').check();
-    await page.locator('div:nth-child(11) > .card-body > .row > .col-md-12 > div > .d-flex > div').first().click();
-    await page.locator('div:nth-child(11) > .card-body > .row > .col-md-12 > div > .d-flex > div').first().click();
     await page.locator('#managerInsurance-yes').check();
     await page.locator('#structuralInspection-yes').check();
-    await page.locator('#onsiteManager-no').check();
     await page.locator('#onsiteManager-yes').check();
-    await page.locator('#onsiteManager-no').check();
-    await page.locator('div:nth-child(13) > .card-body > .row > .col-md-12 > div > .d-flex > .me-4').click();
-    await page.locator('#onsiteManager-yes').check();
-    await page.getByRole('textbox', { name: 'Hours available:' }).click();
     await page.getByRole('textbox', { name: 'Hours available:' }).fill('24');
-    await page.locator('div:nth-child(14) > .card-body > .row > .col-md-12 > div > .d-flex > .me-4 > .form-check-label').click();
     await page.locator('#unitsForRental-yes').check();
-    await page.locator('div:nth-child(14) > .card-body > .row > .col-md-12 > div > .d-flex > div:nth-child(2) > .form-check-label').click();
-    await page.locator('#unitsForRental-no').check();
-    await page.locator('div:nth-child(14) > .card-body > .row > .col-md-12 > div > .d-flex > .me-4 > .form-check-label').click();
-    await page.locator('#unitsForRental-yes').check();
-    await page.locator('div:nth-child(14) > .card-body > .row > .col-md-12 > div > .d-flex > div:nth-child(2)').click();
-    await page.locator('#unitsForRental-no').check();
-    await page.getByRole('checkbox', { name: 'Good' }).check();
     await page.getByRole('checkbox', { name: 'Improving' }).check();
     await page.locator('#slidingGlassDoors-yes').check();
-    await page.locator('#slidingGlassDoors-no').check();
-    await page.locator('div:nth-child(17) > .card-body > .row > .col-md-12 > div > .d-flex > .me-4').click();
-    await page.locator('#slidingGlassDoors-yes').check();
-    await page.locator('div:nth-child(18) > .card-body > .row > .col-md-12 > div > .d-flex > .me-4 > .form-check-label').click();
-    await page.locator('#entryDoorsLocks-yes').check();
-    await page.locator('#entryDoorsLocks-no').check();
-    await page.locator('div:nth-child(18) > .card-body > .row > .col-md-12 > div > .d-flex > .me-4').click();
     await page.locator('#entryDoorsLocks-yes').check();
     await page.locator('#criminalChecksEmployees-yes').check();
-    await page.locator('#criminalChecksEmployees-no').check();
-    await page.locator('div:nth-child(19) > .card-body > .row > .col-md-12 > div > .d-flex > .me-4').click();
-    await page.locator('#criminalChecksEmployees-yes').check();
-    await page.locator('#criminalChecksTenants-no').check();
     await page.locator('#criminalChecksTenants-yes').check();
-    await page.locator('div:nth-child(21) > .card-body > .row > .col-md-12 > div > .d-flex > div:nth-child(2) > .form-check-label').click();
-    await page.locator('#previousIncidentsAssault-no').check();
-    await page.locator('div:nth-child(21) > .card-body > .row > .col-md-12 > div > .d-flex > .me-4 > .form-check-label').click();
-    await page.locator('#previousIncidentsAssault-yes').check();
     await page.locator('#previousIncidentsAssault-no').check();
     await page.locator('#vacancyPeriodAnticipated-yes').check();
-    await page.locator('.col-md-6 > div > .d-flex > div:nth-child(2)').first().click();
-    await page.locator('#vacancyPeriodAnticipated-no').check();
-    await page.locator('.col-md-6 > div > .d-flex > .me-4').first().click();
-    await page.locator('#vacancyPeriodAnticipated-yes').check();
-    await page.getByRole('textbox', { name: 'If Yes, what % of the units' }).click();
     await page.getByRole('textbox', { name: 'If Yes, what % of the units' }).fill('50');
-    await page.locator('.card-body > div:nth-child(2) > div:nth-child(2)').first().click();
-    await page.locator('#commonRestroom-yes').check();
-    await page.locator('div:nth-child(23) > .card-body > .row > .col-md-12 > div > .d-flex > div:nth-child(2) > .form-check-label').first().click();
-    await page.locator('#commonRestroom-no').check();
-    await page.locator('div:nth-child(23) > .card-body > .row > .col-md-12 > div > .d-flex > .me-4 > .form-check-label').click();
     await page.locator('#commonRestroom-yes').check();
     await page.locator('#privacyLocks-yes').check();
-    await page.locator('div:nth-child(23) > .card-body > .row > .col-md-12 > .mt-2 > .d-flex > div:nth-child(2) > .form-check-label').click();
-    await page.locator('#privacyLocks-no').check();
-    await page.locator('#privacyLocks-yes').check();
-    await page.locator('#electricalSystems-no').check();
     await page.locator('#electricalSystems-yes').check();
-    await page.locator('div:nth-child(24) > .card-body > .row > .col-md-12 > div > .d-flex > div:nth-child(2) > .form-check-label').click();
-    await page.locator('#electricalSystems-no').check();
-    await page.locator('#electricalSystems-yes').check();
-    await page.getByRole('textbox', { name: 'If Yes, please describe' }).click();
     await page.getByRole('textbox', { name: 'If Yes, please describe' }).fill('Test Input');
-    await page.locator('#securityGuards-no').check();
-    await page.locator('div:nth-child(25) > .card-body > .row > .col-md-12 > div > .d-flex > .me-4 > .form-check-label').click();
     await page.locator('#securityGuards-yes').check();
-    await page.getByText('Armed', { exact: true }).click();
     await page.getByRole('checkbox', { name: 'Armed', exact: true }).check();
-    await page.getByText('Unarmed', { exact: true }).click();
     await page.getByRole('checkbox', { name: 'Unarmed' }).check();
-    await page.getByText('Armed', { exact: true }).click();
-    await page.getByRole('checkbox', { name: 'Armed', exact: true }).check();
     await page.getByRole('textbox', { name: 'Hours of patrol From: To:' }).fill('00:00');
     await page.locator('input[name="patrolHoursTo"]').fill('23:59');
-    await page.locator('div:nth-child(4) > .d-flex > .me-4 > .form-check-label').click();
     await page.locator('#arrestPower-yes').check();
-    await page.locator('div:nth-child(4) > .d-flex > div:nth-child(2) > .form-check-label').click();
-    await page.locator('#arrestPower-no').check();
-    await page.locator('div:nth-child(4) > .d-flex > .me-4 > .form-check-label').click();
-    await page.locator('#arrestPower-yes').check();
-    await page.locator('#guardEmployees-yes').check();
-    await page.locator('div:nth-child(5) > .d-flex > div:nth-child(2)').click();
     await page.locator('#guardEmployees-no').check();
-    await page.locator('#guardEmployees-yes').check();
-    await page.locator('#guardEmployees-no').check();
-    await page.locator('div:nth-child(6) > .d-flex > div:nth-child(2) > .form-check-label').click();
-    await page.locator('#subcontractorsAdditionalInsured-no').check();
-    await page.locator('div:nth-child(6) > .d-flex > .me-4 > .form-check-label').click();
     await page.locator('#subcontractorsAdditionalInsured-yes').check();
-    await page.locator('div:nth-child(7) > .d-flex > div:nth-child(2) > .form-check-label').click();
-    await page.locator('#certificatesOfInsurance-no').check();
-    await page.locator('div:nth-child(7) > .d-flex > .me-4 > .form-check-label').click();
     await page.locator('#certificatesOfInsurance-yes').check();
-    await page.getByRole('textbox', { name: 'Types of Systems - Heating:' }).click();
     await page.getByRole('textbox', { name: 'Types of Systems - Heating:' }).fill('Volcano');
-    await page.getByRole('textbox', { name: 'Types of Systems - A/C:' }).click();
     await page.getByRole('textbox', { name: 'Types of Systems - A/C:' }).fill('Tundra');
     await page.getByRole('textbox', { name: 'Heating - Date of last full' }).fill('2026-11-17');
     await page.getByRole('textbox', { name: 'A/C - Date of last full' }).fill('2026-11-17');
     await page.getByRole('textbox', { name: 'Construction - Date of last' }).fill('2026-11-17');
     await page.getByRole('textbox', { name: 'Wiring - Date of last full' }).fill('2026-11-17');
     await page.getByRole('textbox', { name: 'Plumbing - Date of last full' }).fill('2026-11-17');
-    await page.getByRole('textbox', { name: 'Types of Systems - Plumbing:' }).click();
     await page.getByRole('textbox', { name: 'Types of Systems - Plumbing:' }).fill('Torrent');
-    await page.getByRole('textbox', { name: 'Age of Roof?' }).click();
     await page.getByRole('textbox', { name: 'Age of Roof?' }).fill('1');
-    await page.getByRole('textbox', { name: 'Type of Roof?' }).click();
     await page.getByRole('textbox', { name: 'Type of Roof?' }).fill('Shale');
     await page.getByRole('textbox', { name: 'Roof - last updated:' }).fill('2026-11-17');
-    await page.locator('div:nth-child(28) > .card-body > .row > .col-md-12 > div > .d-flex > .me-4 > .form-check-label').click();
     await page.locator('#entireComplexFenced-yes').check();
-    await page.locator('div').filter({ hasText: /^Is the entire complex fenced\?YesNo$/ }).nth(1).click();
-    await page.locator('#entireComplexFenced-no').check();
-    await page.locator('div:nth-child(28) > .card-body > .row > .col-md-12 > div > .d-flex > .me-4 > .form-check-label').click();
-    await page.locator('#entireComplexFenced-yes').check();
-    await page.locator('div:nth-child(29) > .card-body > .row > .col-md-12 > div > .d-flex > .me-4 > .form-check-label').click();
     await page.locator('#entrancesExitsHaveGates-yes').check();
-    await page.locator('div:nth-child(29) > .card-body > .row > .col-md-12 > div > .d-flex > div:nth-child(2) > .form-check-label').click();
-    await page.locator('#entrancesExitsHaveGates-no').check();
-    await page.locator('div:nth-child(29) > .card-body > .row > .col-md-12 > div > .d-flex > .me-4 > .form-check-label').click();
-    await page.locator('#entrancesExitsHaveGates-yes').check();
-    await page.getByText('Is the building on the').click();
-    await page.locator('div:nth-child(30) > .card-body > .row > .col-md-12 > div > .d-flex > div:nth-child(2) > .form-check-label').click();
-    await page.locator('#buildingHistoricalRegistry-no').check();
-    await page.locator('div:nth-child(30) > .card-body > .row > .col-md-12 > div > .d-flex > .me-4 > .form-check-label').click();
     await page.locator('#buildingHistoricalRegistry-yes').check();
-    await page.getByText('Any renovation planned?YesNo').click();
-    await page.locator('div:nth-child(31) > .card-body > .row > .col-md-12 > div > .d-flex > div:nth-child(2) > .form-check-label').click();
-    await page.locator('#renovationPlanned-no').check();
-    await page.locator('div:nth-child(31) > .card-body > .row > .col-md-12 > div > .d-flex > .me-4 > .form-check-label').click();
     await page.locator('#renovationPlanned-yes').check();
-    await page.getByRole('textbox', { name: 'If so, provide details,' }).click();
-    await page.getByRole('textbox', { name: 'If so, provide details,' }).click();
     await page.getByRole('textbox', { name: 'If so, provide details,' }).fill('None');
-    await page.locator('div:nth-child(32) > .card-body > .row > .col-md-12 > div > .d-flex > div:nth-child(2) > .form-check-label').click();
     await page.locator('#demolitionPlanned-no').check();
-    await page.locator('div:nth-child(32) > .card-body > .row > .col-md-12 > div > .d-flex > .me-4 > .form-check-label').click();
-    await page.locator('#demolitionPlanned-yes').check();
-    await page.locator('div:nth-child(32) > .card-body > .row > .col-md-12 > div > .d-flex > div:nth-child(2) > .form-check-label').click();
-    await page.locator('#demolitionPlanned-no').check();
-    await page.locator('div:nth-child(33) > .card-body > .row > .col-md-12 > div > .d-flex > .me-4 > .form-check-label').click();
-    await page.locator('#unrepairedDamages-yes').check();
     await page.locator('#unrepairedDamages-no').check();
-    await page.locator('.d-flex.align-items-center.mb-2 > .me-4 > .form-check-label').click();
     await page.locator('#unmitigatedPCBs-yes').check();
-    await page.locator('.d-flex.align-items-center.mb-2 > div:nth-child(2) > .form-check-label').click();
-    await page.locator('#unmitigatedPCBs-no').check();
-    await page.locator('#unmitigatedPCBs-yes').check();
-    await page.getByRole('textbox', { name: 'If so, provide details:' }).click();
     await page.getByRole('textbox', { name: 'If so, provide details:' }).fill('None');
-    await page.locator('.mb-4 > .col-md-6 > div > .d-flex > .me-4 > .form-check-label').first().click();
     await page.locator('#sprinklered-yes').check();
-    await page.locator('.mb-4 > .col-md-6 > div > .d-flex > div:nth-child(2)').first().click();
-    await page.locator('.mb-4 > .col-md-6 > div > .d-flex > div:nth-child(2)').first().click();
-    await page.locator('#sprinklered-no').check();
-    await page.locator('.mb-4 > .col-md-6 > div > .d-flex > .me-4').first().click();
-    await page.locator('#sprinklered-yes').check();
-    await page.getByText('Full', { exact: true }).click();
     await page.getByRole('checkbox', { name: 'Full' }).check();
-    await page.getByText('Partial', { exact: true }).click();
-    await page.getByRole('checkbox', { name: 'Partial' }).check();
-    await page.getByText('Full', { exact: true }).click();
-    await page.getByRole('checkbox', { name: 'Full' }).check();
-    await page.locator('div:nth-child(3) > .col-md-12 > div > div > div > .d-flex > .me-4 > .form-check-label').first().click();
     await page.locator('#smokeDetectors-yes').check();
-    await page.locator('#smokeDetectors-no').check();
-    await page.locator('#smokeDetectors-yes').check();
-    await page.locator('div').filter({ hasText: /^CO2 DetectorYesNo$/ }).first().click();
-    await page.locator('div:nth-child(2) > div > .d-flex > .me-4 > .form-check-label').first().click();
-    await page.locator('#co2Detector-yes').check();
-    await page.locator('#co2Detector-no').check();
-    await page.locator('div:nth-child(2) > div > .d-flex > .me-4').first().click();
-    await page.locator('div:nth-child(2) > div > .d-flex > .me-4').first().click();
     await page.locator('#co2Detector-yes').check();
     await page.locator('#hardWiredBatteryBackup-yes').check();
-    await page.locator('div:nth-child(3) > div:nth-child(2) > div > .d-flex').first().click();
-    await page.locator('#hardWiredBatteryBackup-no').check();
-    await page.locator('div').filter({ hasText: /^Fire ExtinguishersYesNo$/ }).first().click();
-    await page.locator('#hardWiredBatteryBackup-yes').click();
-    await page.locator('#hardWiredBatteryBackup-yes').check();
-    await page.locator('#fireExtinguishers-no').check();
     await page.locator('#fireExtinguishers-yes').check();
-    await page.locator('#carbonMonoxideDetectors-no').check();
     await page.locator('#carbonMonoxideDetectors-yes').check();
-    await page.locator('#sparkArresterChimney-no').check();
     await page.locator('#sparkArresterChimney-yes').check();
-    await page.locator('#damperFunctional-no').check();
     await page.locator('#damperFunctional-yes').check();
-    await page.locator('#flueChimneyCleaned-no').check();
     await page.locator('#flueChimneyCleaned-yes').check();
-    await page.locator('#premisesWoodedArea-no').check();
     await page.locator('#premisesWoodedArea-yes').check();
-    await page.getByRole('textbox', { name: 'How often are detectors' }).click();
     await page.getByRole('textbox', { name: 'How often are detectors' }).fill('Daily');
-    await page.getByRole('textbox', { name: 'How often are batteries' }).click();
     await page.getByRole('textbox', { name: 'How often are batteries' }).fill('Monthly');
-    await page.locator('div:nth-child(5) > div > div:nth-child(3) > .col-md-12 > div > .d-flex > .me-4').click();
-    await page.locator('#housingCodesCompliant-no').check();
     await page.locator('#housingCodesCompliant-yes').check();
     await page.locator('#pullCords-yes').check();
-    await page.locator('#pullCords-no').check();
-    await page.locator('#pullCords-yes').check();
-    await page.getByRole('textbox', { name: 'If yes, who does the' }).click();
     await page.getByRole('textbox', { name: 'If yes, who does the' }).fill('Test Input ');
-    await page.getByRole('textbox', { name: 'Enter any additional notes,' }).click();
     await page.getByRole('textbox', { name: 'Enter any additional notes,' }).fill('Test Input');
     await page.getByRole('button', { name: 'Continue' }).click();
+
+    // Coverage options
     await page.locator('select[name="medicalExpense"]').selectOption('10,000');
     await page.locator('select[name="damageToPremisesRented"]').selectOption('250,000');
-    await page.getByText('BackContinue').click();
     await page.getByRole('button', { name: 'Continue' }).click();
-    await page.getByRole('textbox', { name: 'Applicant Name: *' }).click();
+
+    // Applicant & Agency Information
     await page.getByRole('textbox', { name: 'Applicant Name: *' }).fill('Test Applicant ND');
-    await page.getByRole('textbox', { name: 'DBA:' }).click();
     await page.getByRole('textbox', { name: 'DBA:' }).fill('Test ND Applicant');
-    await page.getByRole('textbox', { name: 'Applicant Phone Number: *' }).click();
-    await page.getByRole('textbox', { name: 'Applicant Phone Number: *' }).click();
     await page.getByRole('textbox', { name: 'Applicant Phone Number: *' }).fill('(323) 258-2600');
-    await page.locator('div').filter({ hasText: /^Proposed Policy Period From: \*$/ }).first().click();
     await page.getByRole('textbox', { name: 'Proposed Policy Period From: *' }).fill('2026-11-17');
     await page.getByRole('textbox', { name: 'Proposed Policy Period To: *' }).fill('2026-11-17');
-    await page.getByLabel('Business Entity:').selectOption('Partnership');
     await page.getByLabel('Business Entity:').selectOption('Other');
-    await page.getByRole('textbox', { name: 'Please specify' }).click();
     await page.getByRole('textbox', { name: 'Please specify' }).fill('Test Input');
-    await page.getByRole('textbox', { name: 'Applicant Mailing Address: *' }).click();
-    await page.getByRole('textbox', { name: 'Applicant Mailing Address: *' }).click();
     await page.getByRole('textbox', { name: 'Applicant Mailing Address: *' }).fill('7442 N Figueroa Street, Los Angeles, CA 90041');
-    await page.getByRole('textbox', { name: 'Applicant Mailing Address: *' }).click();
-    await page.getByRole('textbox', { name: 'Applicant Mailing Address: *' }).press('ControlOrMeta+c');
-    await page.getByRole('textbox', { name: 'City: *' }).click();
     await page.getByRole('textbox', { name: 'City: *' }).fill('Los Angeles');
     await page.getByLabel('State: *').selectOption('CA');
-    await page.getByRole('textbox', { name: 'Zip Code: *' }).click();
     await page.getByRole('textbox', { name: 'Zip Code: *' }).fill('90041');
-    await page.getByRole('textbox', { name: 'Phone Number for Inspection' }).click();
     await page.getByRole('textbox', { name: 'Phone Number for Inspection' }).fill('(323) 258-2600');
-    await page.getByRole('textbox', { name: 'Inspection Contact:', exact: true }).click();
     await page.getByRole('textbox', { name: 'Inspection Contact:', exact: true }).fill('ND');
-    await page.getByRole('textbox', { name: 'Web Address:' }).click();
     await page.getByRole('textbox', { name: 'Web Address:' }).fill('https://neitclem.com/');
-    await page.getByRole('textbox', { name: 'Description of Primary' }).click();
     await page.getByRole('textbox', { name: 'Description of Primary' }).fill('Test Input');
-    await page.getByRole('textbox', { name: 'Agency:' }).click();
-    await page.getByRole('textbox', { name: 'Agency:' }).click();
     await page.getByRole('textbox', { name: 'Agency:' }).fill('NeitClem Wholesale Insurance Brokerage, Inc.');
-    await page.getByRole('textbox', { name: 'Agent:' }).click();
     await page.getByRole('textbox', { name: 'Agent:' }).fill('ND');
-    await page.getByRole('textbox', { name: 'Agent Email:' }).click();
     await page.getByRole('textbox', { name: 'Agent Email:' }).fill('ndelacruz@neitclem.com');
-    await page.getByRole('textbox', { name: 'Agent Phone Number:' }).click();
     await page.getByRole('textbox', { name: 'Agent Phone Number:' }).fill('(323) 258-2600');
-    await page.getByRole('textbox', { name: 'Agency Mailing Address:' }).click();
     await page.getByRole('textbox', { name: 'Agency Mailing Address:' }).fill('7442 N Figueroa Street, Los Angeles, CA 90041');
-    await page.getByRole('textbox', { name: 'Agency City:' }).click();
-    await page.getByRole('textbox', { name: 'Agency City:' }).click();
     await page.getByRole('textbox', { name: 'Agency City:' }).fill('Los Angeles');
     await page.getByLabel('Agency State:').selectOption('CA');
-    await page.getByRole('textbox', { name: 'Agency Zip:' }).click();
     await page.getByRole('textbox', { name: 'Agency Zip:' }).fill('90041');
     await page.getByRole('button', { name: 'Continue' }).click();
+
+    // Property Coverage section
     await page.locator('select[name="locationNumber"]').selectOption('1');
-    await page.locator('input[name="buildingNumber"]').click();
     await page.locator('input[name="buildingNumber"]').fill('1');
-    await page.locator('input[name="territory"]').click();
     await page.locator('input[name="territory"]').fill('Test Input');
-    await page.locator('select[name="construction"]').selectOption('Frame');
-    await page.locator('select[name="construction"]').selectOption('Fire Resistive');
-    await page.getByText('Construction-Select one-').click();
     await page.locator('select[name="construction"]').selectOption('Masonry Non-Combustible');
-    await page.getByRole('textbox', { name: 'sq ft' }).click();
     await page.getByRole('textbox', { name: 'sq ft' }).fill('10000');
     await page.locator('select[name="protectionClass"]').selectOption('10');
-    await page.locator('div:nth-child(2) > div > .col-md-6').first().click();
     await page.locator('select[name="propertyClassCode"]').selectOption('0311');
     await page.locator('select[name="causeOfLoss"]').selectOption('Special');
-    await page.locator('div').filter({ hasText: /^ExclusionsExcl TheftExcl VandalismExcl Sprinkler Leakage$/ }).nth(1).click();
-    await page.getByRole('checkbox', { name: 'Excl Theft' }).check();
-    await page.getByRole('checkbox', { name: 'Excl Theft' }).uncheck();
-    await page.locator('div').filter({ hasText: /^Excl Vandalism$/ }).click();
-    await page.getByRole('checkbox', { name: 'Excl Vandalism' }).check();
-    await page.getByRole('checkbox', { name: 'Excl Vandalism' }).dblclick();
     await page.getByRole('checkbox', { name: 'Excl Sprinkler Leakage' }).check();
-    await page.getByRole('checkbox', { name: 'Excl Sprinkler Leakage' }).uncheck();
     await page.getByRole('checkbox', { name: 'Sprinkler system' }).check();
-    await page.getByRole('checkbox', { name: 'Sprinkler system' }).dblclick();
     await page.getByRole('checkbox', { name: 'Central station fire alarm' }).check();
-    await page.getByRole('checkbox', { name: 'Sprinkler system' }).check();
     await page.getByRole('checkbox', { name: 'Central station burglar alarm' }).check();
-    await page.getByRole('textbox', { name: 'Enter crime score' }).click();
     await page.getByRole('textbox', { name: 'Enter crime score' }).fill('0');
     await page.locator('select[name="deductible"]').selectOption('25,000');
     await page.getByRole('radio', { name: 'Incl' }).check();
-    await page.locator('div').filter({ hasText: /^Excl$/ }).click();
-    await page.getByRole('radio', { name: 'Excl' }).check();
-    await page.locator('div').filter({ hasText: /^Windstorm or HailInclExcl$/ }).first().click();
-    await page.getByRole('radio', { name: 'Incl' }).check();
     await page.locator('select[name="windHailDeductible"]').selectOption('25,000');
-    await page.getByRole('textbox', { name: '%' }).click();
     await page.getByRole('textbox', { name: '%' }).fill('100');
-    await page.getByRole('textbox', { name: '$' }).click();
     await page.getByRole('textbox', { name: '$' }).fill('69000');
-    await page.getByRole('textbox', { name: 'Description' }).click();
-    await page.getByRole('textbox', { name: 'Description' }).click();
     await page.getByRole('textbox', { name: 'Description' }).fill('Test input');
     await page.getByRole('button', { name: '➕Add' }).click();
     await page.locator('div:nth-child(2) > div > div > .form-control-dark').first().selectOption('Personal Property of Others');
-    await page.getByRole('textbox', { name: '0' }).click();
     await page.getByRole('textbox', { name: '0' }).fill('1000000');
     await page.locator('div:nth-child(2) > div:nth-child(3) > div > .form-control-dark').selectOption('100%');
     await page.locator('div:nth-child(2) > div:nth-child(4) > div > .form-control-dark').selectOption('RC');
-    await page.getByRole('textbox', { name: 'Enter any additional property' }).click();
     await page.getByRole('textbox', { name: 'Enter any additional property' }).fill('Test Input');
     await page.getByRole('button', { name: 'Continue' }).click();
+
+    // Summary / Review step
     await page.getByRole('button', { name: 'Proceed to Summary' }).click();
-    await page.getByText('BackContinue').click();
     await page.getByRole('button', { name: 'Continue' }).click();
-    await page.getByRole('button', { name: '← Go Back to Review' }).click();
-    await page.getByRole('button', { name: 'Continue' }).click();
+
+    // Confirmation modal: click Proceed to advance past review
+    await expect(page.getByRole('button', { name: 'Proceed' })).toBeVisible();
     await page.getByRole('button', { name: 'Proceed' }).click();
+
+    // ==========================================
+    // Carrier Selection & Submission
+    // ==========================================
     await page.getByText('Liability + Property Coverage AvailableSubmission').nth(1).click();
-    await page.getByText('Liability + Property Coverage AvailableSubmission').nth(2).click();
     await page.getByRole('button', { name: 'Submit Application' }).click();
-    await page.getByRole('textbox', { name: 'Enter your full name' }).click();
     await page.getByRole('textbox', { name: 'Enter your full name' }).fill('Test ND');
-    await page.getByRole('textbox', { name: 'Enter your email address' }).click();
     await page.getByRole('textbox', { name: 'Enter your email address' }).fill('ndelacruz@neitclem.com');
-    await page.getByRole('textbox', { name: 'Enter your agency name (' }).click();
     await page.getByRole('textbox', { name: 'Enter your agency name (' }).fill('NeitClem Wholesale Insurance Brokerage, Inc.');
-    await page.getByRole('textbox', { name: 'Enter any additional' }).click();
-    await page.getByRole('textbox', { name: 'Enter any additional' }).fill('This is a test. No further action required');
-    await page.getByRole('dialog').click();
-    await page.getByRole('checkbox', { name: 'By checking this box you' }).check();
-    await page.getByRole('textbox', { name: 'Enter any additional' }).click();
     await page.getByRole('textbox', { name: 'Enter any additional' }).fill('This is a test. No further action required.');
+    await page.getByRole('checkbox', { name: 'By checking this box you' }).check();
     await page.getByRole('button', { name: 'Save & Send Application' }).click();
-    // Wait for the save to finish (overlay gone) before interacting further
+
+    // Wait for the save to finish before proceeding
     await expect(page.getByRole('heading', { name: 'Saving Application' })).toBeHidden({ timeout: 60_000 });
     await expect(page.getByRole('button', { name: 'Preview Application PDF' })).toBeVisible({ timeout: 30_000 });
-    await page.getByRole('button', { name: 'Preview Application PDF' }).click();
-    await page.getByRole('button', { name: 'Close' }).click();
-    await page.getByRole('button', { name: 'Preview ACORD PDF' }).click();
-    await page.getByRole('button', { name: 'Close' }).click();
-    await page.getByRole('button', { name: 'Print Confirmation' }).click();
+
+    // Go back to carrier selection and submit a second carrier
     await page.getByRole('button', { name: '← Back to Carrier Selection' }).click();
     await page.getByRole('button', { name: 'Go Back' }).click();
-    await page.locator('div').filter({ hasText: /^Liability \+ Property Coverage Available$/ }).nth(1).click();
     await page.getByText('Liability + Property Coverage AvailableSubmission').nth(1).click();
     await page.getByRole('button', { name: 'Submit Application' }).click();
-    await page.getByRole('textbox', { name: 'Enter your full name' }).click();
-    await page.getByRole('textbox', { name: 'Enter your full name' }).fill('test ND');
-    await page.getByRole('dialog').click();
-    await page.getByRole('textbox', { name: 'Enter your email address' }).click();
+    await page.getByRole('textbox', { name: 'Enter your full name' }).fill('Test ND');
     await page.getByRole('textbox', { name: 'Enter your email address' }).fill('ndelacruz@neitclem.com');
-    await page.getByRole('textbox', { name: 'Enter your agency name (' }).click();
     await page.getByRole('textbox', { name: 'Enter your agency name (' }).fill('NeitClem Wholesale Insurance Brokerage, Inc.');
-    await page.getByRole('textbox', { name: 'Enter any additional' }).click();
     await page.getByRole('textbox', { name: 'Enter any additional' }).fill('This is a test. No further action required.');
-    await page.getByRole('textbox', { name: 'Enter any additional' }).press('ControlOrMeta+a');
-    await page.getByRole('textbox', { name: 'Enter any additional' }).press('ControlOrMeta+c');
-    await page.getByRole('dialog').click();
     await page.getByRole('checkbox', { name: 'By checking this box you' }).check();
     await page.getByRole('button', { name: 'Save & Send Application' }).click();
-    // Wait for the save to finish (overlay gone) before interacting further
+
+    // Wait for save to complete
     await expect(page.getByRole('heading', { name: 'Saving Application' })).toBeHidden({ timeout: 60_000 });
+
+    // Go back and submit a third carrier
     await page.getByRole('button', { name: '← Back to Carrier Selection' }).click();
     await page.getByRole('button', { name: 'Go Back' }).click();
     await page.getByText('Liability + Property Coverage AvailableSubmission').first().click();
     await page.getByRole('button', { name: 'Submit Application' }).click();
-    await page.getByRole('textbox', { name: 'Enter your full name' }).click();
     await page.getByRole('textbox', { name: 'Enter your full name' }).fill('Test ND');
-    await page.getByRole('textbox', { name: 'Enter your email address' }).click();
     await page.getByRole('textbox', { name: 'Enter your email address' }).fill('ndelacruz@neitclem.com');
-    await page.getByRole('textbox', { name: 'Enter your agency name (' }).click();
     await page.getByRole('textbox', { name: 'Enter your agency name (' }).fill('NeitClem Wholesale Insurance Brokerage, Inc.');
-    await page.getByRole('textbox', { name: 'Enter any additional' }).click();
     await page.getByRole('textbox', { name: 'Enter any additional' }).fill('This is a test. No further action required.');
-    await page.getByRole('dialog').click();
     await page.getByRole('checkbox', { name: 'By checking this box you' }).check();
     await page.getByRole('button', { name: 'Save & Send Application' }).click();
-    // Wait for the save to finish (overlay gone) before interacting further
+
+    // Wait for save to complete
     await expect(page.getByRole('heading', { name: 'Saving Application' })).toBeHidden({ timeout: 60_000 });
-    // Confirm we reached the confirmation screen; fail fast with a screenshot if not
+
+    // Confirm we reached the confirmation screen; take a screenshot if not
     const startNew = page.getByRole('button', { name: 'Start New Application' });
     try {
         await expect(startNew).toBeVisible({ timeout: 15_000 });
     } catch (e) {
-        await page.screenshot({ path: 'test-results/final-step.png', fullPage: true });
+        await page.screenshot({ path: 'test-results/habitational-final-step.png', fullPage: true });
         throw e;
     }
+
     await startNew.click();
     await page.getByRole('dialog').getByRole('button', { name: 'Start New Application' }).click();
 });
