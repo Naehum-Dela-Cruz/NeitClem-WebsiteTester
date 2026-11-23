@@ -2070,5 +2070,299 @@
     "status": 200,
     "ok": true,
     "checkedAt": "2026-11-22T15:47:55.100Z"
+  },
+  {
+    "name": "Habitational Application",
+    "url": "https://habitational.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:09.894Z"
+  },
+  {
+    "name": "Inland Marine Application",
+    "url": "https://inland-marine.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:11.407Z"
+  },
+  {
+    "name": "Lessors Risk Application",
+    "url": "https://lessors-risk.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:13.299Z"
+  },
+  {
+    "name": "Owner's Interest Application",
+    "url": "https://owners-interest.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:14.634Z"
+  },
+  {
+    "name": "Vacant Building Supplemental Application",
+    "url": "https://vacant-building.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:16.504Z"
+  },
+  {
+    "name": "Vacant Land Supplemental Application",
+    "url": "https://vacant-lot.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:17.872Z"
+  },
+  {
+    "name": "Salvage Yard Application",
+    "url": "https://salvage-yard.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:19.732Z"
+  },
+  {
+    "name": "Cannabis Application",
+    "url": "https://cannabis.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:21.600Z"
+  },
+  {
+    "name": "Convenience Store & Gas Station Application",
+    "url": "https://gas-station.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:22.949Z"
+  },
+  {
+    "name": "Discontinued Completed Operations Application",
+    "url": "https://discontinued-operations.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:24.307Z"
+  },
+  {
+    "name": "Environmental Application",
+    "url": "https://environmental-services.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:26.167Z"
+  },
+  {
+    "name": "Excess Application",
+    "url": "https://excess.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:28.066Z"
+  },
+  {
+    "name": "Firearms Application",
+    "url": "https://firearms.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:29.922Z"
+  },
+  {
+    "name": "Funeral Home Application",
+    "url": "https://funeral.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:31.768Z"
+  },
+  {
+    "name": "Health, Nutrition & Lifestyle Application",
+    "url": "https://natural-products.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:33.654Z"
+  },
+  {
+    "name": "Kratom Application",
+    "url": "https://kratom.neitclem.com/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:35.059Z"
+  },
+  {
+    "name": "Non-Invasive Weight Loss Supplemental Application",
+    "url": "https://weight-loss.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:36.916Z"
+  },
+  {
+    "name": "Liquor Liability Application",
+    "url": "https://liquor-liability.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:38.781Z"
+  },
+  {
+    "name": "Restaurant & Tavern Application",
+    "url": "https://restaurant-tavern.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:40.117Z"
+  },
+  {
+    "name": "Special Events Application",
+    "url": "https://special-events.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:41.965Z"
+  },
+  {
+    "name": "Cosmetic Manufacturing Application",
+    "url": "https://cosmetic-manufacturing.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:43.296Z"
+  },
+  {
+    "name": "Insurance, Agents & Brokers Professional Liability Application",
+    "url": "https://professional-liability.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:44.633Z"
+  },
+  {
+    "name": "Medical Professional Application",
+    "url": "https://medical-professional.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:46.476Z"
+  },
+  {
+    "name": "Pharmacy Professional Application",
+    "url": "https://pharmacy-professional.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:48.333Z"
+  },
+  {
+    "name": "Product Liability Application",
+    "url": "https://product-liability.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:50.196Z"
+  },
+  {
+    "name": "Real Estate Liability Application",
+    "url": "https://real-estate.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:52.052Z"
+  },
+  {
+    "name": "Sexual Abuse & Molestation Liability Application",
+    "url": "https://sexual-liability.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:53.915Z"
+  },
+  {
+    "name": "Title Agent Application",
+    "url": "https://title-agent.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:55.250Z"
+  },
+  {
+    "name": "Contractors Application",
+    "url": "https://contractors.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:56.596Z"
+  },
+  {
+    "name": "Contractors Equipment Application",
+    "url": "https://contractors-equipment.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:52:58.210Z"
+  },
+  {
+    "name": "Contractors Verus Application",
+    "url": "https://contractors-verus.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:53:00.080Z"
+  },
+  {
+    "name": "Fire Suppression Contractor Professional Liability Application",
+    "url": "https://fire-suppression.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:53:01.947Z"
+  },
+  {
+    "name": "Janitorial Supplemental Application",
+    "url": "https://janitorial.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:53:03.320Z"
+  },
+  {
+    "name": "Traffic Control Application",
+    "url": "https://traffic-control.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:53:05.214Z"
+  },
+  {
+    "name": "Tree Trimming, Landscape Gardening & Lawn Care Services Application",
+    "url": "https://landscaping.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:53:07.079Z"
+  },
+  {
+    "name": "Wrap-Up Application",
+    "url": "https://wrap-up.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:53:08.430Z"
+  },
+  {
+    "name": "Micro Cyber Liability Application",
+    "url": "https://micro-cyber.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:53:10.299Z"
+  },
+  {
+    "name": "Ransomware Application",
+    "url": "https://ransomware.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:53:11.649Z"
+  },
+  {
+    "name": "Garage Application",
+    "url": "https://garage.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:53:13.517Z"
+  },
+  {
+    "name": "Garage Verus Application",
+    "url": "https://garage-verus.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:53:15.396Z"
+  },
+  {
+    "name": "Recreational Vehicle Application",
+    "url": "https://recreational-vehicle.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:53:17.273Z"
+  },
+  {
+    "name": "Tire Dealer & Service/Repair Supplemental Application",
+    "url": "https://tiredealer.gratusinc.org/",
+    "status": 200,
+    "ok": true,
+    "checkedAt": "2026-11-23T19:53:19.132Z"
   }
 ]
